@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bill-ly/routes"
 	"bill-ly/routes/auth"
+	"bill-ly/utils"
 	"fmt"
 	"log"
 	"net/http"
@@ -19,17 +21,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"message" : "hello"}`))
 }
 
-func test(w http.ResponseWriter, req *http.Request) {
-	req.ParseForm()
-	x := req.Form
-	resp := `{"message" : ` + `"` + x["test"][0] + `"}`
-	w.Write([]byte(resp))
-}
-
 func main() {
+	auth.SetupGoGurardian() // Setup go guardian
+	DB := utils.InitDB()
+	h := routes.New(DB)
 	mux := mux.NewRouter() 
-	mux.HandleFunc("/", handler)
-	mux.HandleFunc("/post", test)
+	mux.HandleFunc("/", auth.Middleware(http.HandlerFunc(handler))).Methods("GET")
+	mux.HandleFunc("/auth/register", h.Register).Methods("POST")
 	mux.HandleFunc("/auth/token", auth.CreateToken).Methods("GET")
 	fmt.Println("server running on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
