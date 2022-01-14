@@ -8,12 +8,12 @@ type UserLogin struct {
 type UserRegister struct {
 	Username string
 	Password string
-	Email string
+	Email    string
 }
 
 type User struct {
-	Id string `json:"id" gorm:"primaryKey"`
+	Id       string `json:"id" gorm:"primaryKey"`
 	Username string `json:"username"`
 	Password string `json:"password"`
-	Email string `json:"email"`
+	Email    string `json:"email"`
 }
